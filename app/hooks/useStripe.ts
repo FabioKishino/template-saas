@@ -1,68 +1,66 @@
-import { useEffect, useState } from "react";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
+import { useEffect, useState } from "react";
 
 export function useStripe() {
   const [stripe, setStripe] = useState<Stripe | null>(null);
 
   useEffect(() => {
     async function loadStripeAsync() {
-      const stripeInstance = await loadStripe(
-        process.env.NEXT_PUBLIC_STRIPE_PUB_KEY!
-      );
+      const stripeInstance = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUB_KEY!);
       setStripe(stripeInstance);
     }
-      loadStripeAsync();
-  }, [])
+
+    loadStripeAsync();
+  }, []);
 
   async function createPaymentStripeCheckout(checkoutData: any) {
-    if(!stripe) return;
+    if (!stripe) return;
 
     try {
       const response = await fetch("/api/stripe/create-pay-checkout", {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(checkoutData),
-      });
+      })
 
       const data = await response.json();
 
-      await stripe.redirectToCheckout({ sessionId: data.id });
-
+      await stripe.redirectToCheckout({ sessionId: data.sessionId })
     } catch (error) {
-      console.error("Error creating payment:", error);
+      console.error(error);
     }
   }
 
+
   async function createSubscriptionStripeCheckout(checkoutData: any) {
-    if(!stripe) return;
+    if (!stripe) return;
 
     try {
       const response = await fetch("/api/stripe/create-subscription-checkout", {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(checkoutData),
-      });
+      })
 
       const data = await response.json();
 
-      await stripe.redirectToCheckout({ sessionId: data.id });
-
+      await stripe.redirectToCheckout({ sessionId: data.id })
     } catch (error) {
-      console.error("Error creating payment:", error);
+      console.error(error);
     }
   }
 
   async function handleCreateStripePortal() {
     const response = await fetch("/api/stripe/create-portal", {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-    });
+    })
 
     const data = await response.json();
 
@@ -72,9 +70,6 @@ export function useStripe() {
   return {
     createPaymentStripeCheckout,
     createSubscriptionStripeCheckout,
-    handleCreateStripePortal
+    handleCreateStripePortal,
   };
 }
-
-
-// 25:16
